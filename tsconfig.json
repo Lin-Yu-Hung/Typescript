@@ -10,8 +10,10 @@
     ],
     "skipLibCheck": true,
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "bundler", //路徑處理方法
     "allowImportingTsExtensions": true,
+    // 在import 套件時如果套件本身沒有設定export default時可以直接引入 
+    // 像是 import vue from 'vue' 但是如果此設定關閉的話就需要改成 import * as vue from 'vue' 就需要額外去做別名的動作。
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
@@ -20,7 +22,14 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "strictPropertyInitialization": false, // 檢查class物件屬性是否強制要求輸入初始值
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": [
+        "*"
+      ]
+    }
   },
   "include": [
     "src/**/*.ts",
