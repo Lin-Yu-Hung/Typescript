@@ -97,6 +97,54 @@ const messages = ref([
     time: "11:01 AM",
     date: "Today",
   },
+  {
+    user: "me",
+    text: "Hello !! This is message from me",
+    time: "10:05 PM",
+    date: "November 15",
+  },
+  {
+    user: "John Lewis",
+    text: "Hi !! This is 2nd message from John Lewis",
+    time: "11:59 PM",
+    date: "Yesterday",
+  },
+  {
+    user: "me",
+    text: "Hello !! This is 2nd message from me",
+    time: "09:15 AM",
+    date: "Today",
+  },
+  {
+    user: "John Lewis",
+    text: "Subscribe Easy Tutorials Channel to watch more videos and Press bell icon.",
+    time: "11:01 AM",
+    date: "Today",
+  },
+  {
+    user: "me",
+    text: "Hello !! This is message from me",
+    time: "10:05 PM",
+    date: "November 15",
+  },
+  {
+    user: "John Lewis",
+    text: "Hi !! This is 2nd message from John Lewis",
+    time: "11:59 PM",
+    date: "Yesterday",
+  },
+  {
+    user: "me",
+    text: "Hello !! This is 2nd message from me",
+    time: "09:15 AM",
+    date: "Today",
+  },
+  {
+    user: "John Lewis",
+    text: "Subscribe Easy Tutorials Channel to watch more videos and Press bell icon.",
+    time: "11:01 AM",
+    date: "Today",
+  },
 ]);
 </script>
 
