@@ -18,7 +18,7 @@ echo > .nojekyll
 git init
 git checkout -B main
 git add -A
-git commit -m '[新增] 新增聊天室窗UI'
+git commit -m '[新增] 新增資料'
 
 git push origin main
 
