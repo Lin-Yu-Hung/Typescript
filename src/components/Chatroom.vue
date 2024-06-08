@@ -1,35 +1,43 @@
 <template>
   <div class="chat-container">
-    <div class="header p-3 d-flex align-items-center">
-      <router-link to="/" class="text-white text-decoration-none">
-        <span class="me-3 fs-5">&#x1F860;</span></router-link
+    <div class="header p-3 d-flex align-items-center justify-content-between">
+      <router-link
+        to="/"
+        class="text-white text-decoration-none"
+        @click="leaveRoom"
       >
-      <h2 class="text-center title">{{ roomId }}</h2>
+        <i class="bi bi-arrow-left fs-4 fw-bold"></i
+      ></router-link>
+      <h2 class="text-center title">{{ String(roomId).toUpperCase() }}</h2>
+      <div class="d-flex">
+        <i class="bi bi-person-circle me-1"></i>
+        {{ roomSize }}
+      </div>
     </div>
     <div class="messages p-3">
-      <div v-for="(message, index) in messages" :key="index" class="message">
+      <div v-for="(message, index) in messages" :key="index">
+        <div v-if="message.type === 'others'" class="ms-2 mb-1 fw-bold">
+          {{ message.user }}
+        </div>
         <div
           v-if="message.type === 'own' || message.type === 'others'"
           :class="[
-            'd-flex',
+            'd-flex mb-4',
             message.type === 'own' ? 'justify-content-end' : '',
           ]"
         >
           <div
-            class="d-flex mb-4 align-items-end"
+            class="d-flex align-items-end"
             style="max-width: 75%"
             :class="{ 'flex-row-reverse': message.type === 'own' }"
           >
             <div class="d-flex flex-column">
-              <span v-if="message.type !== 'own'" class="ms-2 mb-1 fw-bold">{{
-                message.user
-              }}</span>
               <div
-                class="message-content message-others p-3"
+                class="message-content p-3"
                 :class="
                   message.type === 'own'
                     ? 'text-white sender'
-                    : 'bg-light receiver border'
+                    : 'bg-light border'
                 "
               >
                 {{ message.text }}
@@ -45,7 +53,11 @@
             </small>
           </div>
         </div>
-        <div v-else class="text-center text-secondary" style="font-size: 14px">
+        <div
+          v-else
+          class="text-center text-secondary mb-3"
+          style="font-size: 14px"
+        >
           {{ message.text }}
         </div>
       </div>
@@ -61,9 +73,7 @@
         placeholder="write message.."
         @keydown.enter="sendMessage"
       />
-      <span class="me-3 fs-4" role="button" @click="sendMessage"
-        >&#x2B9A;
-      </span>
+      <i class="bi bi-send" role="button" @click="sendMessage"></i>
     </div>
   </div>
 </template>
@@ -73,10 +83,17 @@ import { ref, Ref, nextTick } from "vue";
 import { io } from "socket.io-client";
 import { useRoute } from "vue-router";
 
-const socket = io(import.meta.env.VITE_SOCKET_DOMAIN);
+// const socket = io("https://express-4080e68s-projects.vercel.app");
+const socket = io("http://localhost:3000");
 const message: Ref<string> = ref("test");
 const route = useRoute();
 const { userName, roomId } = route.params;
+const roomSize: Ref<number> = ref(0);
+
+socket.emit("joinRoom", {
+  name: userName,
+  roomId,
+});
 
 const getCurrentTime = (): string => {
   const now: Date = new Date();
@@ -103,37 +120,50 @@ const scrollToBottom = () => {
 const sendMessage = () => {
   if (!message.value) return;
   socket.emit("sendMessage", {
+    userName,
     roomId,
     message: message.value,
   });
   message.value = "";
   scrollToBottom();
 };
-socket.emit("joinRoom", {
-  name: userName,
-  roomId,
+
+const leaveRoom = () => {
+  socket.emit("leaveRoom", {
+    name: userName,
+    roomId,
+  });
+};
+socket.on("roomSize", (size: number) => {
+  roomSize.value = size;
 });
-socket.on("joinFinish", (msg: string) => {
+
+socket.on("systemMsg", (msg: string) => {
   messages.value.push({
-    user: userName,
+    user: null,
     text: msg,
     time: getCurrentTime(),
     type: "system",
   });
 });
 
-socket.on("returnMessage", (msg: string) => {
-  // console.log("🚀  msg:", msg);
-
-  // 使用範例
+socket.on("returnMessage", (msgInfo: { userName: string; message: string }) => {
   messages.value.push({
-    user: userName,
-    text: msg,
+    user: msgInfo.userName,
+    text: msgInfo.message,
     time: getCurrentTime(),
-    type: "own",
+    type: msgInfo.userName === userName ? "own" : "others",
   });
+  scrollToBottom();
 });
-const messages: Ref<any[string]> = ref([
+
+interface Message {
+  user: string | unknown;
+  text: string;
+  time: string;
+  type: string;
+}
+const messages: Ref<Message[]> = ref([
   {
     user: "John Lewis",
     text: "Hi !! This is message from John Lewis",
@@ -181,10 +211,6 @@ const messages: Ref<any[string]> = ref([
 
 .sender {
   background-color: #1b232e;
-}
-
-.receiver {
-  background-color: #f1f0f0;
 }
 
 input.form-control {

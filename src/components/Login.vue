@@ -35,12 +35,12 @@
 </template>
 
 <script setup lang="ts">
-// import { io } from "socket.io-client";
+import { io } from "socket.io-client";
 import { ref, Ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-// const socket = io("http://localhost:3000");
+const socket = io("http://localhost:3000");
 // 監聽與後端的連線事件
 
 const userName: Ref<string> = ref("使用者1");
@@ -48,16 +48,18 @@ const chatroom: Ref<string> = ref("room1");
 
 const login = (): void => {
   if (!userName.value) return;
-  // socket.emit("joinRoom", {
-  //   name: userName.value,
-  //   roomId: chatroom.value,
-  // });
-  router.push(`/Chatroom/${userName.value}/${chatroom.value}`);
+  socket.emit("login", {
+    name: userName.value,
+    roomId: chatroom.value,
+  });
 };
-
-// socket.on("returnMessage", (msg: string) => {
-//   console.log("🚀  msg:", msg);
-// });
+socket.on("loginStatus", (status: boolean) => {
+  if (status) {
+    router.push(`/Chatroom/${userName.value}/${chatroom.value}`);
+  } else {
+    alert("已有相同使用者");
+  }
+});
 </script>
 
 <style lang="scss" scoped>
