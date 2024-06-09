@@ -1,7 +1,9 @@
 <template>
   <div class="login-container">
+    <!-- <h2 class="text-center fw-bold fs-1 text-white mb-4">即時聊天室</h2> -->
+
     <div class="login-card">
-      <h2 class="mb-3 mb-xl-5 text-center">登入</h2>
+      <h2 class="mb-3 mb-xl-5 text-center">即時聊天室</h2>
       <div class="mb-3">
         <label for="username" class="form-label">使用者名稱</label>
         <input
@@ -45,7 +47,7 @@ const socket = io(import.meta.env.VITE_SOCKET_DOMAIN);
 // const socket = io("https://express-hello-world-wllx.onrender.com/");
 // 監聽與後端的連線事件
 
-const userName: Ref<string> = ref("使用者1");
+const userName: Ref<string> = ref("User1");
 const chatroom: Ref<string> = ref("room1");
 sessionStorage.removeItem("isReload");
 const login = (): void => {
@@ -68,8 +70,9 @@ socket.on("loginStatus", (status: boolean) => {
 .login-container {
   display: flex;
   justify-content: center;
+  flex-direction: column;
   align-items: center;
-  height: 100vh;
+  height: 100svh;
 }
 
 .login-card {
