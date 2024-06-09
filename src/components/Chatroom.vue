@@ -4,7 +4,7 @@
       <router-link
         to="/"
         class="text-white text-decoration-none"
-        @click="leaveRoom"
+        @click="leaveRoom()"
       >
         <i class="bi bi-arrow-left fs-4 fw-bold"></i
       ></router-link>
