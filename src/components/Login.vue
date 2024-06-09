@@ -42,6 +42,7 @@ import { errorAlert } from "@/methods/sweetAlert";
 
 const router = useRouter();
 const socket = io(import.meta.env.VITE_SOCKET_DOMAIN);
+// const socket = io("https://express-hello-world-wllx.onrender.com/");
 // 監聽與後端的連線事件
 
 const userName: Ref<string> = ref("使用者1");

@@ -84,8 +84,8 @@ import { io } from "socket.io-client";
 import { useRoute, useRouter } from "vue-router";
 import { errorAlert } from "@/methods/sweetAlert";
 
-// const socket = io("https://express-4080e68s-projects.vercel.app");
 const socket = io(import.meta.env.VITE_SOCKET_DOMAIN);
+// const socket = io("https://express-hello-world-wllx.onrender.com/");
 const message: Ref<string> = ref("");
 const route = useRoute();
 const router = useRouter();
