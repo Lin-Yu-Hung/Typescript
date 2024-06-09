@@ -63,14 +63,14 @@
       </div>
     </div>
     <div class="footer p-3 d-flex align-items-center">
-      <i class="bi bi-mic-fill me-3"></i>
+      <!-- <i class="bi bi-mic-fill me-3"></i>
       <i class="bi bi-camera-fill me-3"></i>
-      <i class="bi bi-image-fill me-3"></i>
+      <i class="bi bi-image-fill me-3"></i> -->
       <input
         type="text"
         v-model="message"
         class="form-control me-3"
-        placeholder="write message.."
+        placeholder="請輸入訊息..."
         @keydown.enter="sendMessage"
       />
       <i class="bi bi-send" role="button" @click="sendMessage"></i>
@@ -79,22 +79,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, Ref, nextTick } from "vue";
+import { ref, Ref, nextTick, onMounted } from "vue";
 import { io } from "socket.io-client";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import { errorAlert } from "@/methods/sweetAlert";
 
 // const socket = io("https://express-4080e68s-projects.vercel.app");
-const socket = io("http://localhost:3000");
-const message: Ref<string> = ref("test");
+const socket = io(import.meta.env.VITE_SOCKET_DOMAIN);
+const message: Ref<string> = ref("");
 const route = useRoute();
+const router = useRouter();
 const { userName, roomId } = route.params;
 const roomSize: Ref<number> = ref(0);
-
-socket.emit("joinRoom", {
-  name: userName,
-  roomId,
-});
-
 const getCurrentTime = (): string => {
   const now: Date = new Date();
   let hours: number = now.getHours();
@@ -128,10 +124,12 @@ const sendMessage = () => {
   scrollToBottom();
 };
 
-const leaveRoom = () => {
+const leaveRoom = (isReload: boolean = false) => {
+  sessionStorage.removeItem("isReload");
   socket.emit("leaveRoom", {
     name: userName,
     roomId,
+    isReload,
   });
 };
 socket.on("roomSize", (size: number) => {
@@ -156,6 +154,11 @@ socket.on("returnMessage", (msgInfo: { userName: string; message: string }) => {
   });
   scrollToBottom();
 });
+socket.on("logout", () => {
+  errorAlert("Oops...", "你的使用者帳號似乎在其他地方被登入了請重新嘗試。");
+  sessionStorage.removeItem("isReload");
+  router.push("/");
+});
 
 interface Message {
   user: string | unknown;
@@ -163,14 +166,25 @@ interface Message {
   time: string;
   type: string;
 }
-const messages: Ref<Message[]> = ref([
-  {
-    user: "John Lewis",
-    text: "Hi !! This is message from John Lewis",
-    time: "11:01 PM",
-    type: "others",
-  },
-]);
+const messages: Ref<Message[]> = ref([]);
+
+onMounted(() => {
+  const isReload: string | unknown = sessionStorage.getItem("isReload");
+  if (isReload === "true") {
+    leaveRoom(true);
+    sessionStorage.removeItem("isReload");
+    router.push("/");
+  } else {
+    sessionStorage.setItem("isReload", "true");
+    socket.emit("joinRoom", {
+      name: userName,
+      roomId,
+    });
+  }
+});
+window.addEventListener("beforeunload", () => {
+  leaveRoom();
+});
 </script>
 
 <style lang="scss" scoped>

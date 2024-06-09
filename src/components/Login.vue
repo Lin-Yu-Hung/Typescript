@@ -38,14 +38,15 @@
 import { io } from "socket.io-client";
 import { ref, Ref } from "vue";
 import { useRouter } from "vue-router";
+import { errorAlert } from "@/methods/sweetAlert";
 
 const router = useRouter();
-const socket = io("http://localhost:3000");
+const socket = io(import.meta.env.VITE_SOCKET_DOMAIN);
 // 監聽與後端的連線事件
 
 const userName: Ref<string> = ref("使用者1");
 const chatroom: Ref<string> = ref("room1");
-
+sessionStorage.removeItem("isReload");
 const login = (): void => {
   if (!userName.value) return;
   socket.emit("login", {
@@ -57,7 +58,7 @@ socket.on("loginStatus", (status: boolean) => {
   if (status) {
     router.push(`/Chatroom/${userName.value}/${chatroom.value}`);
   } else {
-    alert("已有相同使用者");
+    errorAlert("Oops...", "已有相同使用者");
   }
 });
 </script>
